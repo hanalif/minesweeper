@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/app.css">
+    <title>Minesweeper</title>
+</head>
+
+<body onload="initGame()">
+    <div class="game-container">
+        <h1 class="main-title">Minesweeper</h1>
+        <div class="top-game-container">
+            <div class="mines-count"><span class="mines-count-icon">💣</span><span class="mines-count-num"></span></div>
+            <button class="status-game-btn" onclick="initGame()"><span class="status-game-icon"></span></button>
+        </div>
+    <table>
+        <tbody class="board">
+        </tbody>
+    </table>
+
+    </div>
+    
+
+
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
