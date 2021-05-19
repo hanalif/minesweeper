@@ -3,6 +3,7 @@
 //ELEMENTS FROM DOM
 var elMinesCountNum = document.querySelector('.mines-count-num');
 var elStatusGameIcon = document.querySelector('.status-game-icon');
+var elGameSecondsSpan = document.querySelector('.game-seconds-span');
 
 
 //GLOBAL VARIABLS
@@ -14,10 +15,13 @@ var FLAG_ICON = '🚩';
 
 
 var gBoard;
-var gNumOfGuessedMines = 0;
+var gNumOfFlags;
+var gNumOfFlagsOnMine;
 var gNumOfMines;
-// var gNumCount;
 var gMineCells;
+var gGameTimeSecond;
+var gGameTimeIntervalId;
+var gIsBoardTuched;
 
 var gGame = {
     isOn: null,
@@ -35,7 +39,12 @@ var gLevel = {
 
 
 function initGame() {
+    gGameTimeSecond = 0;
+    elGameSecondsSpan.innerText = `${gGameTimeSecond}`;
     elStatusGameIcon.innerText = '😀';
+    gNumOfFlags = 0;
+    gNumOfFlagsOnMine = 0;
+    gIsBoardTuched = false;
     gMineCells=[];
     gGame.isOn = true;
     gNumOfMines = 4;
@@ -48,7 +57,7 @@ function initGame() {
 
 function buildBoard() {
     //create the matrix
-    var board = createMat(4, 4);
+    var board = createSquareMat(4);
 
     //put mines and empty cells
     for (var i = 0; i < board.length; i++) {
@@ -60,7 +69,7 @@ function buildBoard() {
                 location: { i: i, j: j },
                 isShown: false,
                 isMine: false,
-                isMarked: false
+                isFlagged: false
             }
 
             board[i][j] = cell;
@@ -144,11 +153,14 @@ function cellClicked(i, j) {
     //if game is over you cant click on cells
     if(!gGame.isOn) return;
 
+    setSecondsCountToGame();
+
+
     var cellLocation = { i: i, j: j };
     var currCell = gBoard[i][j];
 
     //checks if cell is marked
-    if (currCell.isMarked) return;
+    if (currCell.isFlagged) return;
 
     if (!currCell.isShown) {
         //update Model
@@ -180,7 +192,7 @@ function renderCell(location, value = '') {
 
     var currCell = gBoard[location.i][location.j];
 
-    if (!currCell.isMarked) {
+    if (!currCell.isFlagged) {
 
         //change cell bg after clicked 
         elCell.classList.remove('cell-bg-before-clicked');
@@ -236,15 +248,21 @@ function cellMarked(i, j, ev) {
     //if game is over you cant mark cells
     if(!gGame.isOn) return;
 
+    setSecondsCountToGame();
+
     var currCell = gBoard[i][j];
 
     //checks if cell is shown
     if (currCell.isShown) return;
 
-    if (!currCell.isMarked) {
-        gNumOfGuessedMines++;
+    if (!currCell.isFlagged) {
+        gNumOfFlags++;
+        if(currCell.isMine){
+            gNumOfFlagsOnMine++;
+        }
+        
         //Update Model
-        currCell.isMarked = true;
+        currCell.isFlagged = true;
         //Update DOM 
         renderCell(currCell.location, FLAG_ICON);
         renderMinesCount();
@@ -253,12 +271,16 @@ function cellMarked(i, j, ev) {
 
     } else {
 
-        gNumOfGuessedMines--;
+        gNumOfFlags--;
+        if(currCell.isMine){
+            gNumOfFlagsOnMine--;
+        }
+
         //Update DOM 
         renderCell(currCell.location, '');
         renderMinesCount();
         // Update Model
-        currCell.isMarked = false;
+        currCell.isFlagged = false;
     }
 
 }
@@ -269,7 +291,7 @@ function renderMinesCount() {
 }
 
 function getDiffOfMines(){
-    var numCount = gNumOfMines - gNumOfGuessedMines;
+    var numCount = gNumOfMines - gNumOfFlags;
     return numCount
 }
 
@@ -278,23 +300,46 @@ function getDiffOfMines(){
 
 function checkGameOver(cell) {
     
-    if (gNumOfGuessedMines === gNumOfMines) {
+    if (gNumOfFlagsOnMine === gNumOfMines) {
         gGame.isOn = false;
         elStatusGameIcon.innerText = '😎';
-    } else if (cell.isMine) {
+        clearInterval(gGameTimeIntervalId);
+        
+    } else if (cell.isMine && !cell.isFlagged) {
         gGame.isOn = false;
         elStatusGameIcon.innerText = '🤯';
         for(var i = 0; i < gMineCells.length; i++){
             var currCell = gMineCells[i];
-            renderCell(currCell.location, MINE_ICON);
-        }  
+            currCell.isFlagged = false;
+            renderCell(currCell.location, MINE_ICON);  
+        } 
+        clearInterval(gGameTimeIntervalId); 
     }
+    
 
 
 }
 
 
-// // When user clicks a cell with no mines around, we need to open not only that cell, but also its neighbors. 
+// // // When user clicks a cell with no mines around, we need to open not only that cell, but also its neighbors. 
 // function expandShown(board, elCell, i, j) {
 
 // }
+
+
+// set seconds to game
+
+function setSecondsCountToGame(){
+    elGameSecondsSpan.innerText = `${gGameTimeSecond}`;
+    if(!gIsBoardTuched){
+        gIsBoardTuched = true;
+        gGameTimeIntervalId = setInterval(()=>{
+            gGameTimeSecond++
+            //DOM
+            elGameSecondsSpan.innerText = `${gGameTimeSecond}`;
+            
+            //Model
+            gGame.secsPassed = gGameTimeSecond; 
+        }, 1000)
+    }
+}

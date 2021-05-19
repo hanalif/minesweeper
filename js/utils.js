@@ -1,9 +1,9 @@
 
-function createMat(ROWS, COLS) {
+function createSquareMat(SIZE) {
     var mat = []
-    for (var i = 0; i < ROWS; i++) {
+    for (var i = 0; i < SIZE; i++) {
         var row = []
-        for (var j = 0; j < COLS; j++) {
+        for (var j = 0; j < SIZE; j++) {
             row.push('')
         }
         mat.push(row)

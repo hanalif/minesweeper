@@ -5,7 +5,7 @@ body {
     color:black
 }
 
-.mines-count {
+.count {
     width:60px; 
     height:60px;
     text-align: center;
@@ -13,7 +13,7 @@ body {
      
 }
 
-.mines-count-icon {
+.count-icon {
    padding-top: 10px;
 }
 
