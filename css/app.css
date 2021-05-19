@@ -35,3 +35,11 @@ body {
 .cell-bg-after-clicked {
     background-color: lightgreen;
 }
+
+.footer {
+    background-color: lightgreen;
+    display: inline-block;
+    width: 176px;
+    text-align: center;
+    margin-top: 20px;
+}

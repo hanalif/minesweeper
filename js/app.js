@@ -191,6 +191,7 @@ function cellClicked(i, j) {
                 renderCell(cellLocation);
             }
         }
+
     }
 
     if (!gIsBoardTouched) {
