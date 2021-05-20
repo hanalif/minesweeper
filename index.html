@@ -12,12 +12,16 @@
         <h1 class="main-title">Minesweeper</h1>
         <div class="top-game-container">
             <div class="count"><span class="count-icon">💣</span><span class="mines-count-num"></span></div>
-            <button class="status-game-btn" onclick="initGame(gSelectedLevelKey)"><span class="status-game-icon"></span></button>
+            <button class="status-game-btn" onclick="initGame(gSelectedLevelKey)"><span class="status-game-icon"></span>
+            </button>
             <div class="count"><span class="count-icon">⏱</span><span class="game-seconds-span"></span></div>
         </div>
         <div class="extra-features-container">
-            <div class="lives"><span class="live-count"></span></div>
-            <div class="clues-container">
+            <div class="lives">
+                <span class="live-count"></span>
+            </div>
+            <div class="clues-container" title="you can choose an unreveald cell, click it and its
+            neighbors will revealed for a second">
                 <!-- <button class="clue" onclick="activateClue()">${CLUE_NOT_ACTIVE}</button> -->
             </div>
         </div>
@@ -29,21 +33,20 @@
             <input type="radio" id="extreme" name="diff" value="extreme" onclick="handleDifficulty(this)">
             <label for="extreme">Extreme</label>
         </div>
-        
 
-    <table class="board-table">
-        <tbody class="board">
-        </tbody>
-    </table>
 
+        <table class="board-table">
+            <tbody class="board">
+            </tbody>
+        </table>
     </div>
+
     <div class="footer">
         <h3>Hana Lipschutz</h3>
     </div>
-    
-    <script src="js/app-with-features2.js"></script>
+
     <script src="js/utils.js"></script>
-    <!-- <script src="js/app.js"></script> -->
+    <script src="js/app.js"></script>
 </body>
 
 </html>
