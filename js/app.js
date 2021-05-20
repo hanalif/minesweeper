@@ -445,7 +445,7 @@ function getDiffOfMines() {
 
 // Game ends when all mines are marked, and all the other cells are shown
 function checkGameOver(cell) {
-    if (gNumOfFlagsOnMine === LEVELS[gSelectedLevelKey].MINES - gUsedLivesCount) {
+    if (gNumOfFlagsOnMine === LEVELS[gSelectedLevelKey].MINES - gUsedLivesCount && gUsedLivesCount !== LIVES_AMOUNT) {
         gGame.isOn = false;
         elStatusGameIcon.innerText = '😎';
         clearInterval(gGameTimeIntervalId);
