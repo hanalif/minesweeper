@@ -2,7 +2,46 @@
 
 body {
     background-color: white; 
-    color:black
+    color:black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.top-game-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.status-game-icon {
+    font-size: 30px;
+}
+
+.game-difficulty {
+    display: flex;
+    justify-content: center;
+}
+
+.extra-features-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.board-table {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .count {
@@ -13,14 +52,17 @@ body {
      
 }
 
-.count-icon {
-   padding-top: 10px;
-}
-
 .cell {
     width:40px; 
     height:40px;
     text-align: center
+}
+
+.count {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-direction: column;
 }
 
 .cell img {
@@ -34,6 +76,23 @@ body {
 
 .cell-bg-after-clicked {
     background-color: lightgreen;
+}
+
+.lives {
+    font-size: 30px;
+    width: 100%;
+    background-color: lightcoral;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.lives span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .footer {

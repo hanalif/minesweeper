@@ -15,6 +15,12 @@
             <button class="status-game-btn" onclick="initGame(gSelectedLevelKey)"><span class="status-game-icon"></span></button>
             <div class="count"><span class="count-icon">⏱</span><span class="game-seconds-span"></span></div>
         </div>
+        <div class="extra-features-container">
+            <div class="lives"><span class="live-count"></span></div>
+            <div class="clues-container">
+                <!-- <button class="clue" onclick="activateClue()">${CLUE_NOT_ACTIVE}</button> -->
+            </div>
+        </div>
         <div class="game-difficulty">
             <input type="radio" id="easy" name="diff" value="easy" checked onclick="handleDifficulty(this)">
             <label for="easy">Easy</label>
@@ -25,7 +31,7 @@
         </div>
         
 
-    <table>
+    <table class="board-table">
         <tbody class="board">
         </tbody>
     </table>
@@ -35,8 +41,9 @@
         <h3>Hana Lipschutz</h3>
     </div>
     
+    <script src="js/app-with-features2.js"></script>
     <script src="js/utils.js"></script>
-    <script src="js/app.js"></script>
+    <!-- <script src="js/app.js"></script> -->
 </body>
 
 </html>
