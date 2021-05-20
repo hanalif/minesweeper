@@ -222,17 +222,12 @@ function cellClicked(i, j) {
                 gUsedLivesCount++;
                 removeLifeFromDOM();
                 renderCell(cellLocation, MINE_ICON);
-
-                if (gUsedLivesCount === LIVES_AMOUNT) {
-                    renderCell(cellLocation, MINE_ICON);
-                    checkGameOver(currCell);
-                }
             }
 
         } else {
             expandShown(gBoard, cellLocation);
         }
-
+        checkGameOver(currCell);
     }
     renderMinesCount();
     gIsBoardTouched = true;
@@ -445,12 +440,14 @@ function getDiffOfMines() {
 
 // Game ends when all mines are marked, and all the other cells are shown
 function checkGameOver(cell) {
-    if (gNumOfFlagsOnMine === LEVELS[gSelectedLevelKey].MINES - gUsedLivesCount && gUsedLivesCount !== LIVES_AMOUNT) {
+    if (gNumOfFlagsOnMine === LEVELS[gSelectedLevelKey].MINES - gUsedLivesCount 
+        && gUsedLivesCount !== LIVES_AMOUNT
+        && gNumOfFlagsOnMine === gNumOfFlags) {
         gGame.isOn = false;
         elStatusGameIcon.innerText = '😎';
         clearInterval(gGameTimeIntervalId);
 
-    } else if (cell.isMine && !cell.isFlagged) {
+    } else if (gUsedLivesCount === LIVES_AMOUNT) {
         gGame.isOn = false;
         elStatusGameIcon.innerText = '🤯';
         for (var i = 0; i < gMineCells.length; i++) {
