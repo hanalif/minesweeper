@@ -234,7 +234,7 @@ function cellClicked(i, j) {
         }
 
     }
-
+    renderMinesCount();
     gIsBoardTouched = true;
 }
 
@@ -439,13 +439,13 @@ function renderMinesCount() {
 }
 
 function getDiffOfMines() {
-    var numCount = LEVELS[gSelectedLevelKey].MINES - gNumOfFlags;
+    var numCount = LEVELS[gSelectedLevelKey].MINES - gNumOfFlags - gUsedLivesCount;
     return numCount
 }
 
 // Game ends when all mines are marked, and all the other cells are shown
 function checkGameOver(cell) {
-    if (gNumOfFlagsOnMine === LEVELS[gSelectedLevelKey].MINES) {
+    if (gNumOfFlagsOnMine === LEVELS[gSelectedLevelKey].MINES - gUsedLivesCount) {
         gGame.isOn = false;
         elStatusGameIcon.innerText = '😎';
         clearInterval(gGameTimeIntervalId);
