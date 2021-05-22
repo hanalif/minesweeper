@@ -51,6 +51,7 @@ var gCluesUsageMaping;
 var gCurrUsedclueNumber;
 var gSafeClicksUsageMaping;
 var gCurrUsedSafeClickNumber;
+var gScore; //nums of user clicks until victory 
 
 
 var gGame = {
@@ -68,8 +69,8 @@ function initGame(level = 'easy') {
     gUsedLivesCount = 0;
     CreatescluesUsageMapObject();
     createSafeClickUsageObject();
-    
-
+    gScore=0;
+    renderScore();
     gGame.isSafeClickActivated = false;
     gGame.isClueActivated = false;
     elGameSecondsSpan.innerText = `${gGameTimeSecond}`;
@@ -130,7 +131,6 @@ function placeRandMinesOnBoard(board, numOfMines) {
 
         gMineCells.push(currCell);
 
-        console.log('mineCells', currCell)
 
         currCell.isMine = true;
         emptyCellPositions.splice(randomIndx, 1);
@@ -241,7 +241,6 @@ function activateSafeClick(elSafeClickBtn){
 
 // Called when a cell (td) is clicked
 function cellClicked(i, j) {
-    console.log('board', gBoard);
     var cellLocation = { i: i, j: j };
     var currCell = gBoard[i][j];
 
@@ -254,13 +253,13 @@ function cellClicked(i, j) {
     if (currCell.isFlagged) return;
 
     if (!currCell.isShown) {
+
         if (gGame.isClueActivated) {
             gGame.isOn = false;
             showForASecondNegsCells(gBoard, currCell.location);
             gGame.isOn = true;
             return;
         }
-
 
         currCell.isShown = true;
         if (!gIsBoardTouched) {
@@ -270,15 +269,18 @@ function cellClicked(i, j) {
         //update DOM
         if (currCell.isMine) {
             if (gUsedLivesCount < LIVES_AMOUNT) {
-
                 gUsedLivesCount++;
                 removeLifeFromDOM();
                 renderCell(cellLocation, MINE_ICON);
             }
 
+
+
+
         } else {
             expandShown(gBoard, cellLocation);
         }
+        gScore++;
         checkGameOver(currCell);
     }
     renderMinesCount();
@@ -506,11 +508,13 @@ function cellMarked(i, j, ev) {
         //Update DOM 
         renderCell(currCell.location, FLAG_ICON);
         renderMinesCount();
+        gScore++;
         checkGameOver(currCell);
 
 
     } else {
 
+        gScore--;
         gNumOfFlags--;
         if (currCell.isMine) {
             gNumOfFlagsOnMine--;
@@ -542,6 +546,11 @@ function checkGameOver(cell) {
         gGame.isOn = false;
         elStatusGameIcon.innerText = '😎';
         clearInterval(gGameTimeIntervalId);
+        var highestScore = (localStorage.getItem(getScoreAtLocatStorage()) != null) ?  +localStorage.getItem(getScoreAtLocatStorage()) : Infinity ;
+        if(gScore <= highestScore){
+            localStorage.setItem(getScoreAtLocatStorage(), gScore);
+            renderScore();
+        }
 
     } else if (gUsedLivesCount === LIVES_AMOUNT) {
         gGame.isOn = false;
@@ -553,6 +562,17 @@ function checkGameOver(cell) {
         }
         clearInterval(gGameTimeIntervalId);
     }
+}
+
+function getScoreAtLocatStorage(){
+    var str = `score ${gSelectedLevelKey} level`;
+    return str;
+}
+
+function renderScore(){
+    var elScoreSpan = document.querySelector('.scor-span');
+    var highestScoreInLocalStorage =(localStorage.getItem(getScoreAtLocatStorage()) != null)? 'High Score:' + localStorage.getItem(getScoreAtLocatStorage()) : 'No high score yet';
+    elScoreSpan.innerText = highestScoreInLocalStorage;
 }
 
 // set seconds to game
