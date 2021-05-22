@@ -6,6 +6,7 @@ var elStatusGameIcon = document.querySelector('.status-game-icon');
 var elGameSecondsSpan = document.querySelector('.game-seconds-span');
 var elLiveCount = document.querySelector('.live-count');
 var elCluesContainer = document.querySelector('.clues-container');
+var elSafeClicksContainer = document.querySelector('.safe-clicks-container');
 
 //GLOBAL VARIABLS
 var MINE = 'MINE';
@@ -18,6 +19,7 @@ var CLUE_NOT_ACTIVE_ICON = '⭐';
 var CLUE_ACTIVE_ICON = '🌟';
 var LIVES_AMOUNT = 3;
 var CLUES_AMOUNT = 3;
+var SAFE_CLICKS_AMOUNT = 3;
 
 var LEVELS = {
     easy: {
@@ -34,6 +36,8 @@ var LEVELS = {
     }
 }
 
+
+
 var gSelectedLevelKey;
 var gBoard;
 var gNumOfFlags;
@@ -43,22 +47,30 @@ var gGameTimeSecond;
 var gGameTimeIntervalId;
 var gIsBoardTouched;
 var gUsedLivesCount;
-var gUsedCluesCount;
+var gCluesUsageMaping;
+var gCurrUsedclueNumber;
+var gSafeClicksUsageMaping;
+var gCurrUsedSafeClickNumber;
+
 
 var gGame = {
     isOn: null,
     isClueActivated: null,
+    isSafeClickActivated: null,
     shownCount: 0,
     markedCount: 0,
     secsPassed: 0
 }
 
 function initGame(level = 'easy') {
-    clearInterval(gGameTimeIntervalId);
     gSelectedLevelKey = level;
     gGameTimeSecond = 0;
     gUsedLivesCount = 0;
-    gUsedCluesCount = 0;
+    CreatescluesUsageMapObject();
+    createSafeClickUsageObject();
+    
+
+    gGame.isSafeClickActivated = false;
     gGame.isClueActivated = false;
     elGameSecondsSpan.innerText = `${gGameTimeSecond}`;
     elStatusGameIcon.innerText = '😀';
@@ -67,12 +79,14 @@ function initGame(level = 'easy') {
     gIsBoardTouched = false;
     gMineCells = [];
     gGame.isOn = true;
+    clearInterval(gGameTimeIntervalId);
     gBoard = createSquareMat(LEVELS[gSelectedLevelKey].SIZE);
     buildBoard(gBoard);
     renderMinesCount();
     renderBoard(gBoard);
     renderLives();
     renderClues();
+    renderSafeClicks();
 }
 
 function buildBoard(board) {
@@ -164,29 +178,63 @@ function renderLives() {
 //render clues
 function renderClues() {
     var strHTML = '';
-    var remainingClues = CLUES_AMOUNT - gUsedCluesCount;
-    for (var i = 0; i < remainingClues; i++) {
-        strHTML += `\n<button class="clue clue-${i}" onclick="activateClue(this)">${CLUE_NOT_ACTIVE_ICON}</button>\n`
+    for (var i = 0; i < CLUES_AMOUNT; i++) {
+        strHTML += `\n<button class="clue" data-clue-number="${i}" onclick="activateClue(this)">${CLUE_NOT_ACTIVE_ICON}</button>\n`
     }
     elCluesContainer.innerHTML = strHTML;
 }
 
-
-// Returns the class name for a specific cell
-function getClassName(location) {
-    var cellClass = 'cell-' + location.i + '-' + location.j;
-    return cellClass;
-}
-
-
 // function that activates the clue
 
 function activateClue(elClueBtn) {
+    gCurrUsedclueNumber = elClueBtn.dataset.clueNumber;
     if (gGame.isClueActivated) return;
+    if(gCluesUsageMaping[gCurrUsedclueNumber])return;
     gGame.isClueActivated = true;
     elClueBtn.innerText = CLUE_ACTIVE_ICON;
 
 }
+
+function CreatescluesUsageMapObject(){
+    gCluesUsageMaping={}; 
+    for(var i = 1; i <= CLUES_AMOUNT; i++){
+        gCluesUsageMaping[i] = false
+    }
+    return gCluesUsageMaping;
+}
+
+
+function createSafeClickUsageObject(){
+    gSafeClicksUsageMaping={};
+    for(var i = 1; i<=SAFE_CLICKS_AMOUNT; i++){
+        gSafeClicksUsageMaping[i]=false;
+    }
+} 
+
+
+
+//render Safe-clicks
+
+function renderSafeClicks(){
+    var strHTML = '';
+    for (var i = 0; i < SAFE_CLICKS_AMOUNT; i++){
+        strHTML+= `\n<button class="safe-click" data-safe-click-number="${i}" onclick="activateSafeClick(this)">Safe-click</button>\n`
+    } 
+    elSafeClicksContainer.innerHTML = strHTML;
+    
+}
+
+//function that activates the safe-click
+
+function activateSafeClick(elSafeClickBtn){
+    gCurrUsedSafeClickNumber = elSafeClickBtn.dataset.safeClickNumber; 
+    if(gGame.isSafeClickActivated) return;
+    if(gSafeClicksUsageMaping[gCurrUsedSafeClickNumber])return;
+    gGame.isSafeClickActivated = true;
+    elSafeClickBtn.style.color = "red";
+}
+
+
 
 // Called when a cell (td) is clicked
 function cellClicked(i, j) {
@@ -206,6 +254,13 @@ function cellClicked(i, j) {
         if (gGame.isClueActivated) {
             gGame.isOn = false;
             showForASecondNegsCells(gBoard, currCell.location);
+            gGame.isOn = true;
+            return;
+        }
+
+        if(gGame.isSafeClickActivated){
+            gGame.isOn = false;
+            markArandomSafeCell(gBoard);
             gGame.isOn = true;
             return;
         }
@@ -238,6 +293,7 @@ function cellClicked(i, j) {
 function expandShown(board, location) {
     if (!gGame.isOn) return;
     if (gGame.isClueActivated) return;
+    if(gGame.isSafeClickActivated)return;
     var cell = board[location.i][location.j];
     //if cell is a mine don't check negs
     if (cell.isMine) return;
@@ -305,10 +361,45 @@ function showForASecondNegsCells(board, location) {
             }
         }
         gGame.isClueActivated = false;
+        gCluesUsageMaping[gCurrUsedclueNumber] = true;
+        
     }, 1000);
 
 }
 
+
+// marks a random safe cell after the user clicked a safe click button
+
+function markArandomSafeCell(board){
+    var notMinesCells = [];
+    for(var i = 0; i<board.length; i++){
+        for(var j=0; j<board[0].length; j++){
+            var cell = board[i][j];
+            if(cell.isMine)continue;
+            if(cell.isFlagged)continue;
+            if(cell.isShown)continue;
+            notMinesCells.push(cell);
+        }
+    }
+
+    var indexOfRandomNoneMineCell = getRandomIntInclusive(0, notMinesCells.length - 1);
+    var randNoneMineCell = notMinesCells[indexOfRandomNoneMineCell];
+    var elRandNoneMineCell = getCellElement(randNoneMineCell.location.i, randNoneMineCell.location.j);
+        elRandNoneMineCell.classList.remove('cell-bg-before-clicked');
+        elRandNoneMineCell.classList.add('safe-click-cell');
+
+    setTimeout(() => {
+
+        elRandNoneMineCell.classList.remove('safe-click-cell');
+        elRandNoneMineCell.classList.add('cell-bg-before-clicked');
+        gGame.isSafeClickActivated = false;
+        gSafeClicksUsageMaping[gCurrUsedSafeClickNumber] = true;
+    }, 1000);
+}
+
+
+
+// render cell after clue
 function renderCellAfterClue(location, value = '') {
 
 
@@ -321,6 +412,8 @@ function renderCellAfterClue(location, value = '') {
     elCellSpan.innerText = value;
 
 }
+
+
 
 // update DOM when cell clicked. (location such as: {i: 2, j: 7}) 
 function renderCell(location, value = '') {
@@ -344,6 +437,12 @@ function renderCell(location, value = '') {
         // set the span value
         elCellSpan.innerText = value;
     }
+}
+
+// Returns the class name for a specific cell
+function getClassName(location) {
+    var cellClass = 'cell-' + location.i + '-' + location.j;
+    return cellClass;
 }
 
 function getCellElement(i, j) {
