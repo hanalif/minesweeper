@@ -252,6 +252,8 @@ function cellClicked(i, j) {
     //checks if cell is marked
     if (currCell.isFlagged) return;
 
+    if (gGame.isSafeClickActivated) return;
+
     if (!currCell.isShown) {
 
         if (gGame.isClueActivated) {
