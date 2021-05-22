@@ -232,6 +232,9 @@ function activateSafeClick(elSafeClickBtn){
     if(gSafeClicksUsageMaping[gCurrUsedSafeClickNumber])return;
     gGame.isSafeClickActivated = true;
     elSafeClickBtn.style.color = "red";
+    gGame.isOn = false;
+    markArandomSafeCell(gBoard);
+    gGame.isOn = true;
 }
 
 
@@ -258,12 +261,6 @@ function cellClicked(i, j) {
             return;
         }
 
-        if(gGame.isSafeClickActivated){
-            gGame.isOn = false;
-            markArandomSafeCell(gBoard);
-            gGame.isOn = true;
-            return;
-        }
 
         currCell.isShown = true;
         if (!gIsBoardTouched) {
